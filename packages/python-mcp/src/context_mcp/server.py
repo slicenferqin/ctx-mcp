@@ -103,34 +103,34 @@ def _get_git_status() -> str:
 # --- Tools ---
 
 @mcp.tool()
-def init_context() -> str:
+def initialize_context_system() -> str:
     """
     Initialize the Context Engineering directory structure (.ai/skills, .agent_memory).
     Use this when starting a new project or if the context structure is missing.
     """
     results = []
-    
+
     # Create directories
     for d in [SKILLS_DIR, OBSERVATIONS_DIR, CACHE_DIR]:
         d.mkdir(parents=True, exist_ok=True)
         results.append(f"✅ Created directory: {d}")
-        
+
     # Create templates
     skills_file = SKILLS_DIR / "coding-standards.md"
     if not skills_file.exists():
         skills_file.write_text(CODING_STANDARDS_TEMPLATE)
         results.append(f"✅ Created skill: {skills_file}")
-        
+
     goals_file = MEMORY_DIR / "goals.md"
     if not goals_file.exists():
         goals_file.write_text(GOALS_TEMPLATE)
         results.append(f"✅ Created memory: {goals_file}")
-        
+
     gitignore = MEMORY_DIR / ".gitignore"
     if not gitignore.exists():
         gitignore.write_text("*\n!.gitignore\n!goals.md\n")
         results.append(f"✅ Created .gitignore for memory")
-        
+
     return "\n".join(results)
 
 @mcp.tool()
@@ -193,15 +193,28 @@ def read_observation(file_path: str) -> str:
     """
     Read the full content of a previously saved observation file.
     Use this when you need the details of a file referenced in a summary.
-    
+
     Args:
-        file_path: The absolute or relative path to the observation file.
+        file_path: The filename or relative path within observations directory.
     """
-    path = Path(file_path)
+    # Security: restrict to observations directory only
+    safe_filename = Path(file_path).name  # Extract just the filename
+    path = OBSERVATIONS_DIR / safe_filename
+
     if not path.exists():
-        return f"Error: File not found at {file_path}"
-    
+        return f"Error: File not found at {path}"
+
+    # Additional security check: ensure resolved path is within observations dir
+    try:
+        path.resolve().relative_to(OBSERVATIONS_DIR.resolve())
+    except ValueError:
+        return f"Error: Access denied - file must be in observations directory"
+
     return path.read_text()
 
-if __name__ == "__main__":
+def main():
+    """Entry point for the MCP server."""
     mcp.run()
+
+if __name__ == "__main__":
+    main()

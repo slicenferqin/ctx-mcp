@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 import os
-import sys
 import argparse
 import subprocess
 import time
 from pathlib import Path
-import json
 from datetime import datetime
 
 # --- Configuration ---
@@ -183,6 +181,9 @@ def cmd_wrap(args):
     is_long = len(combined) > 1000 or combined.count('\n') > 20
 
     if is_long or args.force:
+        # Ensure observations directory exists
+        OBSERVATIONS_DIR.mkdir(parents=True, exist_ok=True)
+
         # Save to file
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         cmd_slug = "_".join(cmd)[:30].replace("/", "_") # simplistic slug
