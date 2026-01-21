@@ -1,0 +1,29 @@
+{
+  "name": "context-engineering-mcp",
+  "version": "0.1.0",
+  "description": "MCP Server for Context Engineering",
+  "main": "dist/index.js",
+  "bin": {
+    "context-engineering-mcp": "./dist/index.js"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "context",
+    "ai",
+    "agent"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}

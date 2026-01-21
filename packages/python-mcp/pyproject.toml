@@ -1,0 +1,19 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "context-mcp"
+version = "0.1.0"
+description = "A Model Context Protocol (MCP) server for Context Engineering"
+authors = [
+    { name = "Context Engineer", email = "engineer@example.com" }
+]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=0.1.0"
+]
+
+[project.scripts]
+context-mcp = "context_mcp.server:main"
