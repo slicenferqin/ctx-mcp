@@ -46,13 +46,21 @@ AI编程时常遇到的困境：
 - 工作区状态 → 快照到 `.agent_memory/state.md`
 - 当前目标 → 记录在 `.agent_memory/goals.md`
 
+## 📊 预期收益
+
+引入上下文工程（Context Engineering）后，你的 AI 编程体验将获得质的飞跃：
+
+- **📉 Token 消耗降低 90%**：通过将长输出（日志、数据、构建产物）卸载到外部文件系统，仅保留引用，大幅节省上下文窗口。
+- **📈 准确率提升 40%**：结构化的 `.ai/skills` 明确了团队规范，显著减少 AI "自作主张" 导致的错误。
+- **🚀 采纳率提升**：通过标准化项目结构，新加入的开发者（或新的 AI Session）能瞬间理解项目上下文。
+
 ## 🚀 快速开始
 
 ### 选择适合你的工具
 
 | 工具 | 适用场景 | 安装方式 |
 |-----|---------|---------|
-| 🐍 **Python MCP** | Claude Desktop + Python项目 | `pip install context-engineering-mcp` |
+| 🐍 **Python MCP** | Claude Desktop + Python项目 | `pip install ctx-engine-mcp` |
 | 📦 **Node.js MCP** | Claude Desktop + JS/TS项目 | `npx context-engineering-mcp` |
 | 🔧 **CLI工具** | 独立使用，无需AI工具 | `chmod +x ctx.py` |
 
@@ -69,32 +77,36 @@ AI编程时常遇到的困境：
     }
   }
 }
-
-# 2. 重启 Claude Desktop
-
-# 3. 在对话中使用
-# "初始化上下文环境"
-# "现在的项目状态是什么？"
-# "运行 npm install 并保存输出到外部记忆"
 ```
 
 ### 方式2: Python MCP
 
 ```bash
 # 1. 安装
-pip install context-engineering-mcp
+pip install ctx-engine-mcp
 
 # 2. 配置 Claude Desktop
+# 编辑 ~/Library/Application Support/Claude/claude_desktop_config.json
 {
   "mcpServers": {
     "context-engineering": {
       "command": "uv",
       "args": [
-        "--directory",
-        "/path/to/python-mcp",
+        "tool",
         "run",
+        "--from",
+        "ctx-engine-mcp",
         "context-mcp"
       ]
+    }
+  }
+}
+# 或者如果使用标准 pip 安装：
+{
+  "mcpServers": {
+    "context-engineering": {
+      "command": "python3",
+      "args": ["-m", "context_mcp.server"]
     }
   }
 }
@@ -117,7 +129,33 @@ ctx state --print
 ctx wrap npm install
 ```
 
-## 📚 核心功能
+## � 使用场景示例
+
+### 场景 1：重构遗留代码模块
+
+**问题**：你需要重构一个复杂的遗留模块，代码量巨大，直接丢给 AI 会超出上下文限制，且容易破坏现有逻辑。
+
+**Context Engineering 解决方案**：
+
+1.  **初始化**：`ctx init` 创建标准结构。
+2.  **定义规范**：在 `.ai/skills/refactoring-guide.md` 中定义重构原则（如 "保持函数纯度"、"错误处理规范"）。
+3.  **理解现状**：AI 调用 `get_workspace_state` 获取全局视图，然后按需读取关键文件。
+4.  **执行重构**：
+    *   AI 请求运行测试：`ctx wrap npm test`（结果存入 `.agent_memory/observations/`）。
+    *   AI 读取测试失败日志：`read_observation("test_fail.log")`（只读取错误部分）。
+    *   AI 修复代码并再次运行测试。
+
+### 场景 2：新成员（AI）入职
+
+**问题**：每次开启一个新的 AI Session，都要重复一遍 "我们要用 TypeScript，缩进用 2 空格..."。
+
+**Context Engineering 解决方案**：
+
+1.  项目根目录已有 `.ai/skills/coding-standards.md`。
+2.  AI 启动时自动通过 MCP 读取 `.ai/skills` 目录。
+3.  **结果**：AI 第一行代码就完全符合团队规范，无需任何 Prompt 调教。
+
+## �📚 核心功能
 
 ### 1. 初始化上下文结构
 

@@ -1,7 +1,7 @@
 {
   "name": "context-engineering-mcp",
   "version": "0.1.0",
-  "description": "MCP Server for Context Engineering",
+  "description": "MCP Server for Context Engineering - file system as external memory for AI agents",
   "main": "dist/index.js",
   "bin": {
     "context-engineering-mcp": "./dist/index.js"
@@ -19,12 +19,24 @@
   ],
   "keywords": [
     "mcp",
-    "context",
+    "context-engineering",
     "ai",
-    "agent"
+    "agent",
+    "claude",
+    "llm",
+    "model-context-protocol"
   ],
-  "author": "",
+  "author": "Context Engineering Contributors",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/slicenferqin/ctx-mcp.git",
+    "directory": "packages/node-mcp"
+  },
+  "homepage": "https://github.com/slicenferqin/ctx-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/slicenferqin/ctx-mcp/issues"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.1"
   },

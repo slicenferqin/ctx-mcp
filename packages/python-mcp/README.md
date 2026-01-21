@@ -18,9 +18,8 @@
 ### 1. 作为 Python 包安装
 
 ```bash
-# 在你的环境中安装
-pip install .
-# 或者直接使用 uv 运行（推荐）
+# 从 PyPI 安装
+pip install ctx-engine-mcp
 ```
 
 ### 2. 配置 Claude Desktop
@@ -33,9 +32,10 @@ pip install .
     "context-engineering": {
       "command": "uv",
       "args": [
-        "--directory",
-        "/absolute/path/to/context_mcp",
+        "tool",
         "run",
+        "--from",
+        "ctx-engine-mcp",
         "context-mcp"
       ]
     }
@@ -43,7 +43,18 @@ pip install .
 }
 ```
 
-*注意：请将 `/absolute/path/to/context_mcp` 替换为你实际存放此项目的绝对路径。*
+或者使用系统 Python：
+
+```json
+{
+  "mcpServers": {
+    "context-engineering": {
+      "command": "python3",
+      "args": ["-m", "context_mcp.server"]
+    }
+  }
+}
+```
 
 ### 3. 配置 Cursor (即将支持)
 
