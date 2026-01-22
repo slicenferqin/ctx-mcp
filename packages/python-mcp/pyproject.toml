@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ctx-engine-mcp"
-version = "0.1.0"
+version = "0.1.1"
 description = "A Model Context Protocol (MCP) server for Context Engineering - file system as external memory for AI agents"
 authors = [
     { name = "Context Engineering Contributors" }

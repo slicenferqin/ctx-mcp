@@ -75,6 +75,51 @@ async function ensureDirectory(dirPath: string) {
   }
 }
 
+async function ensureContextStructure(): Promise<boolean> {
+  /**
+   * Auto-initialize context structure if it doesn't exist (lazy loading).
+   * Returns true if initialization was performed, false if already exists.
+   */
+  let needsInit = false;
+
+  try {
+    await fs.access(SKILLS_DIR);
+    await fs.access(OBSERVATIONS_DIR);
+  } catch {
+    needsInit = true;
+
+    // Create directories
+    await ensureDirectory(SKILLS_DIR);
+    await ensureDirectory(OBSERVATIONS_DIR);
+    await ensureDirectory(CACHE_DIR);
+
+    // Create coding standards
+    const skillsFile = path.join(SKILLS_DIR, "coding-standards.md");
+    try {
+      await fs.access(skillsFile);
+    } catch {
+      await fs.writeFile(skillsFile, CODING_STANDARDS_TEMPLATE);
+    }
+
+    // Create goals
+    try {
+      await fs.access(GOALS_FILE);
+    } catch {
+      await fs.writeFile(GOALS_FILE, GOALS_TEMPLATE);
+    }
+
+    // Create gitignore
+    const gitignoreFile = path.join(MEMORY_DIR, ".gitignore");
+    try {
+      await fs.access(gitignoreFile);
+    } catch {
+      await fs.writeFile(gitignoreFile, "*\n!.gitignore\n!goals.md\n");
+    }
+  }
+
+  return needsInit;
+}
+
 async function generateTree(dirPath: string, prefix = "", depth = 0, maxDepth = 2): Promise<string[]> {
   if (depth >= maxDepth) return [];
 
@@ -119,7 +164,7 @@ async function generateTree(dirPath: string, prefix = "", depth = 0, maxDepth = 
 const server = new Server(
   {
     name: "context-engineering-mcp",
-    version: "0.1.0",
+    version: "0.1.1",
   },
   {
     capabilities: {
@@ -224,6 +269,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
 
     case "get_workspace_state": {
+      // Auto-initialize if needed
+      await ensureContextStructure();
+
       // 1. Read goals
       let goalsContent = "No goals defined.";
       try {
@@ -262,6 +310,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
 
     case "save_observation": {
+      // Auto-initialize if needed
+      await ensureContextStructure();
+
       const { command, content } = request.params.arguments as { command: string; content: string };
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
       const cmdSlug = command.replace(/[^a-zA-Z0-9]/g, "_").slice(0, 30);
@@ -269,8 +320,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const filePath = path.join(OBSERVATIONS_DIR, filename);
 
       const fileContent = `Command: ${command}\n\n=== CONTENT ===\n${content}`;
-      
-      await ensureDirectory(OBSERVATIONS_DIR);
+
       await fs.writeFile(filePath, fileContent);
 
       const summary = `
@@ -292,6 +342,9 @@ ${content.split('\n').slice(0, 10).join('\n')}
     }
 
     case "read_observation": {
+      // Auto-initialize if needed
+      await ensureContextStructure();
+
       const { filename } = request.params.arguments as { filename: string };
       // Security check: prevent directory traversal
       const safeFilename = path.basename(filename);

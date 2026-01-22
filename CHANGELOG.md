@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-01-21
+
+### Added
+- **Lazy Loading**: All MCP tools now auto-initialize the context structure on first use
+  - `get_workspace_state`, `save_observation`, and `read_observation` automatically create `.ai/skills/` and `.agent_memory/` directories if they don't exist
+  - Users no longer need to explicitly call `initialize_context_system`
+  - Seamless integration with existing projects
+
+### Changed
+- Improved user experience: tools work transparently without manual initialization
+- `initialize_context_system` is now optional - kept for explicit initialization scenarios
+
 ## [0.1.0] - 2026-01-21
 
 ### Added
@@ -63,4 +75,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+[0.1.1]: https://github.com/slicenferqin/ctx-mcp/releases/tag/v0.1.1
 [0.1.0]: https://github.com/slicenferqin/ctx-mcp/releases/tag/v0.1.0

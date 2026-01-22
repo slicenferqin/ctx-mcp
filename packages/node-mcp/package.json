@@ -1,6 +1,6 @@
 {
   "name": "context-engineering-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "MCP Server for Context Engineering - file system as external memory for AI agents",
   "main": "dist/index.js",
   "bin": {

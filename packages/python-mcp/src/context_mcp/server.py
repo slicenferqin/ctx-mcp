@@ -59,6 +59,37 @@ Updated: {timestamp}
 
 # --- Helpers ---
 
+def _ensure_context_structure() -> bool:
+    """
+    Auto-initialize context structure if it doesn't exist (lazy loading).
+    Returns True if initialization was performed, False if already exists.
+    """
+    needs_init = False
+
+    # Check if directories exist
+    if not SKILLS_DIR.exists() or not OBSERVATIONS_DIR.exists():
+        needs_init = True
+
+        # Create directories
+        SKILLS_DIR.mkdir(parents=True, exist_ok=True)
+        OBSERVATIONS_DIR.mkdir(parents=True, exist_ok=True)
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+        # Create templates
+        skills_file = SKILLS_DIR / "coding-standards.md"
+        if not skills_file.exists():
+            skills_file.write_text(CODING_STANDARDS_TEMPLATE)
+
+        goals_file = MEMORY_DIR / "goals.md"
+        if not goals_file.exists():
+            goals_file.write_text(GOALS_TEMPLATE)
+
+        gitignore = MEMORY_DIR / ".gitignore"
+        if not gitignore.exists():
+            gitignore.write_text("*\n!.gitignore\n!goals.md\n")
+
+    return needs_init
+
 def _get_tree(dir_path: str = ".", max_depth: int = 2) -> str:
     """Generate a simplified directory tree string."""
     def generate_lines(path, prefix="", depth=0):
@@ -139,6 +170,9 @@ def get_workspace_state() -> str:
     Get a snapshot of the current workspace state, including goals, file structure, and git status.
     Call this tool to orient yourself before starting a task or when context is lost.
     """
+    # Auto-initialize if needed
+    _ensure_context_structure()
+
     # 1. Read goals
     goals_file = MEMORY_DIR / "goals.md"
     goals_content = goals_file.read_text() if goals_file.exists() else "No goals defined."
@@ -165,19 +199,19 @@ def save_observation(content: str, summary: str, filename_hint: str = "observati
     """
     Save large text content (logs, analysis, code) to the file system memory and return a reference.
     Use this tool when output is too long (>20 lines) to avoid cluttering the context window.
-    
+
     Args:
         content: The full content to save.
         summary: A brief summary of what this content is.
         filename_hint: A short string to use in the filename (e.g., 'npm_install_log').
     """
+    # Auto-initialize if needed
+    _ensure_context_structure()
+
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     safe_hint = "".join(c for c in filename_hint if c.isalnum() or c in "_-")[:30]
     filename = f"{timestamp}_{safe_hint}.txt"
     file_path = OBSERVATIONS_DIR / filename
-    
-    # Ensure dir exists
-    OBSERVATIONS_DIR.mkdir(parents=True, exist_ok=True)
     
     file_path.write_text(content)
     
@@ -197,6 +231,9 @@ def read_observation(file_path: str) -> str:
     Args:
         file_path: The filename or relative path within observations directory.
     """
+    # Auto-initialize if needed
+    _ensure_context_structure()
+
     # Security: restrict to observations directory only
     safe_filename = Path(file_path).name  # Extract just the filename
     path = OBSERVATIONS_DIR / safe_filename
